@@ -1,0 +1,52 @@
+RELATÓRIO
+
+1. Termo de compromisso
+
+Os membros do grupo afirmam que todo o código desenvolvido para este
+trabalho é de autoria própria.  Exceto pelo material listado no item 3
+deste relatório, os membros do grupo afirmam não ter copiado
+material da Internet nem obtiveram código de terceiros.
+
+2. Membros do grupo e alocação de esforço
+
+Preencha as linhas abaixo com o nome e o e-mail dos integrantes do
+grupo.  Substitua XX pela contribuição de cada membro do grupo no
+desenvolvimento do trabalho.
+
+Vinícius Correia Fonseca de Castro - vinícius.correiacastro@gmail.com 50%
+Diego Vinicius de Oliveira Silva - diegovinicius@dcc.ufmg.br 50%
+
+3. Referências bibliográficas
+
+https://en.wikipedia.org/wiki/Standard_streams
+https://www.geeksforgeeks.org/pipe-system-call/
+https://www.geeksforgeeks.org/fork-system-call/
+https://linux.die.net/man/2/close
+https://www.geeksforgeeks.org/exec-family-of-functions-in-c/
+https://www.delftstack.com/howto/c/dup2-in-c/#:~:text=dup2%20function%20creates%20a%20copy,for%20a%20new%20file%20descriptor.
+https://www.geeksforgeeks.org/difference-fork-exec/?ref=lbp
+https://www.geeksforgeeks.org/pipe-system-call/?ref=lbp
+https://www.geeksforgeeks.org/c-program-demonstrate-fork-and-pipe/?ref=lbp
+https://www.geeksforgeeks.org/dup-dup2-linux-system-call/?ref=lbp
+https://www.geeksforgeeks.org/wait-system-call-c/?ref=lbp
+Fundamentos de Sistemas Operacionais (livro texto da disciplina)
+
+4. Estruturas de dados
+
+Tasks: 
+1)
+No primeiro if é verificado se os caracteres da operação são respectivamente “cd “, indicando que o comando realizado é o do change directory. 
+Dentro do if, a função chdir é utilizada, a qual, pesquisando, sabemos que retorna -1 quando acontece um erro e 0 quando acontece sucesso. Assim sendo, os dos if’s do trecho de código se mostram coerentes em realizar a mudança de diretório, quando requisitado, e ao enviar o aviso de erros para o usuário, quando estes ocorrem.
+
+2)
+Para implementar a tarefa 2, utilizamos a função execvp. Essa função recebe como primeiro parâmetro uma string e procura um arquivo com esse nome em cada diretório na variável PATH. O segundo parâmetro é um array de ponteiros para strings que representam a lista de parâmetros disponíveis para o novo programa e nas quais a última posição é NULL.
+
+3):
+A tarefa foi implementada da seguinte maneira: a função dup2 foi utilizada recebendo a função open como argumento. Ao passo que a função open cria um descritor de arquivos e realiza sua manipulação, a função dup2 dois duplica o descritor de arquivos criado.
+
+4)
+A tarefa 4 foi implementada utilizando, principalmente, as funções “fork” e “pipe”. 
+O primeiro passo é, utilizando o array “p” já declarado, criar um pipe, o qual basicamente estabelece um canal linear de conexão de mensagens. O array possui duas posições, a posição 1 é a posição de entrada de informações e a posição 0 é a posição de saída.
+O segundo passo é realizar a chamada do fork o que resultará em um novo processo filho sendo criado.
+Na execução do processo filho (resultado do fork = 0) a entrada dos dados é fechada, pois o processo filho apenas recebe informações. Em seguida, a função dup2 é chamada para atribuir o stdout para a entrada do pipe. E por fim o comando da esquerda é executado. Também foi utilizada a função wait para fazer com que o pai esperasse o fim da execução do filho, já que no pipe os comandos são execuções sequencialmente.
+No processo pai, analogamente ao processo filho, a saída do pipe é fechada, stdin é atribuído para a saída do pipe e o comando da direita é executado.
