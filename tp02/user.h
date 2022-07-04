@@ -23,6 +23,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+// [MOD] // Adicionando importações
 int set_prio(int);
 int wait2(int*, int*, int*);
 int user_yield(void);

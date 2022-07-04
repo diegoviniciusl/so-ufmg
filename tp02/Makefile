@@ -165,7 +165,7 @@ mkfs: mkfs.c fs.h
 # http://www.gnu.org/software/make/manual/html_node/Chained-Rules.html
 .PRECIOUS: %.o
 
-# @TP - changing Makefile files
+# [MOD] Adicionando arquvio sanity no makefile
 UPROGS=\
 	_cat\
 	_echo\
@@ -183,7 +183,6 @@ UPROGS=\
 	_wc\
 	_zombie\
 	_sanity\
-	_test_process_prio\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

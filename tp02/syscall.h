@@ -20,6 +20,8 @@
 #define SYS_link      19
 #define SYS_mkdir     20
 #define SYS_close     21
+// [MOD] // Adicionando constantes
 #define SYS_set_prio  22
 #define SYS_wait2     23
 #define SYS_user_yield 24
+

@@ -103,12 +103,12 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
-// @TP - new syscalls
+// [MOD] // Adicionando systemcalls
 extern int sys_set_prio(void);
 extern int sys_wait2(void);
-extern int user_yield(void);
+extern int sys_yield(void);
 
-// @TP - adding syscalls
+// [MOD] // Adicionando systemcalls
 static int (*syscalls[])(void) = {
 [SYS_fork]     sys_fork,
 [SYS_exit]     sys_exit,
@@ -133,7 +133,7 @@ static int (*syscalls[])(void) = {
 [SYS_close]    sys_close,
 [SYS_set_prio] sys_set_prio,
 [SYS_wait2]    sys_wait2,
-[SYS_user_yield]    user_yield,
+[SYS_user_yield] user_yield,
 };
 
 void

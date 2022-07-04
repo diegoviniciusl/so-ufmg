@@ -3,106 +3,135 @@
 #include "user.h"
 #include "fcntl.h"
 
-void cpuBound()
+int stdout = 1;
+int multiplicador = 3;
+
+void
+CPU_Bound()
 {
-    for (int i = 0; i < 100; i++)
-    {
-        for (int j = 0; j < 1000000; j++)
-        {
+    for (int x = 0; x < 100; x++){
+        for (int y = 0; y < 1000000; y++){
             asm("nop");
         }
     }
 }
 
-void sCpu()
+void
+S_Bound()
 {
-    for (int i = 0; i < 100; i++)
-    {
-        for (int j = 0; j < 1000000; j++)
-        {
+    for (int x = 0; x < 100; x++){
+        for (int y = 0; y < 1000000; y++){
             asm("nop");
         }
         user_yield();
     }
 }
 
-void ioBound()
-{
-    for (int i = 0; i < 100; i++)
-    {
+void
+IO_Bound(){
+    for (int x = 0; x < 100; x++){
         sleep(1);
     }
 }
 
-int main(int argc, char *argv[])
+char*
+get_type(int i)
 {
-    if (argc > 2 || argc < 1)
+    if (i == 0)
     {
-        printf(1, "Invalid arguments\n");
+        return "CPU-Bound";
+    }
+    else if (i == 1)
+    {
+        return "S-Bound";
+    }
+    else
+    {
+        return "IO-Bound";
+    }
+}
+
+int
+main(int argc, char* argv[]) 
+{
+    int n = atoi(argv[1]);
+    if (n <= 0) {
+        printf(stdout, "ERRO!: sanity <n>, n deve ser > 1\n");
         exit();
     }
 
-    int quantity = atoi(argv[1]) * 3;
-    int processesAmounts[3];
-    int readyTime[3];
-    int sleepTime[3];
-    int turnaroundTime[3];
+    int p[3], ready[3], sleeping[3], turnaround[3];
 
-    for (int i = 0; i < 3; i++)
-    {
-        processesAmounts[i] = 0;
-        readyTime[i] = 0;
-        sleepTime[i] = 0;
-        turnaroundTime[i] = 0;
+    // Inicialização
+    for (int i = 0; i < 3; i++){
+        p[i] = 0;
+        ready[i] = 0;
+        sleeping[i] = 0;
+        turnaround[i] = 0;
     }
 
-    for (int i = 0; i < quantity; i++)
-    {
+    for (int i = 0; i < multiplicador * n; i++){
+
         int pid = fork();
-        if (pid == 0)
-        {
-            int type = getpid() % 3;
-            switch (type)
-            {
-            case 0:
-                cpuBound();
-                break;
-            case 1:
-                sCpu();
-                break;
-            case 2:
-                ioBound();
-                break;
+
+        if (pid == 0){
+
+            if (getpid()%3 == 0){
+                CPU_Bound();
             }
+
+            if (getpid()%3 == 1){
+                S_Bound();
+
+            }
+
+            if (getpid()%3 == 2){
+                IO_Bound();
+            }
+            
             exit();
-        }
-        else
-        {
-            processesAmounts[pid % 3]++;
+        } 
+
+        else{
+            p[pid % 3]++;
             continue;
         }
     }
 
-    for (int i = 0; i < quantity; i++)
-    {
-        int retime, rutime, stime;
-        int childPid = wait2(&retime, &rutime, &stime);
-        char *type = childPid % 3 == 0 ? "CPUBound" : (childPid % 3 == 1 ? "SBound" : "IoBound");
+    for (int x = 0; x < multiplicador * n; x++){
 
-        printf(1, "PID: %d\n Type: %s\n Ready time: %d\n Run time: %d\n Sleep time: %d\n\n", childPid, type, retime, rutime, stime);
+        int retime = 0, rutime = 0, stime = 0;
+        int pid_child = wait2(&retime, &rutime, &stime);
+        int index = pid_child % 3;
+        char *type = get_type(index);
+        
+        printf(stdout, "> PID do processo = %d\n / Tipo = %s\n / retime = %d\n / rutime = %d\n / stime = %d\n\n", pid_child, type, retime, rutime, stime);
 
-        readyTime[childPid % 3] += retime;
-        sleepTime[childPid % 3] += stime;
-        turnaroundTime[childPid % 3] += retime + rutime + stime;
+        ready[index] = ready[index] + retime;
+        sleeping[index] = sleeping[index] + stime;
+        turnaround[index] = turnaround[index] + retime + rutime + stime;
     }
 
-    for (int j = 0; j < 3; j++)
-    {
-        char *type = j == 0 ? "CPUBound" : (j == 1 ? "SBound" : "IoBound");
-        printf(1, "%s Proccess count: %d\n", type, processesAmounts[j]);
-        printf(1, "Average ready time: %d\n", readyTime[j]/processesAmounts[j]);
-        printf(1, "Average sleeping time: %d\n",  sleepTime[j]/processesAmounts[j]);
-        printf(1, "Average turnaround time: %d\n\n", turnaroundTime[j]/processesAmounts[j]);
+    int media_ready[3];
+    int media_sleeping[3];
+    int media_turnaround[3];
+
+    printf(stdout, " << Estatisticas Medias >> \n");
+    printf(stdout, "\n");
+
+    for (int x = 0; x<3; x++){
+        printf(stdout, "> Tipo = %s / Processos: %d\n", get_type(x), p[x]);
+        
+        int number_of_p = p[x];
+
+        media_ready[x] = ready[x]/number_of_p;
+        media_sleeping[x] = sleeping[x]/number_of_p;
+        media_turnaround[x] = turnaround[x]/number_of_p;
+        
+        printf(stdout, "> > Tempo READY(RUNNABLE) medio: %d\n", media_ready[x]);
+        printf(stdout, "> > Tempo SLEEPING medio: %d\n", media_sleeping[x]);
+        printf(stdout, "> > Tempo TURNAROUND medio: %d\n", media_turnaround[x]);
+        printf(stdout, "\n");
     }
 
     exit();
